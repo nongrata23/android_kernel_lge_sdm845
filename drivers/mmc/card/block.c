@@ -49,7 +49,7 @@
 #include <linux/mmc/slot-gpio.h>
 #endif
 
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #include "queue.h"
 #include "block.h"
