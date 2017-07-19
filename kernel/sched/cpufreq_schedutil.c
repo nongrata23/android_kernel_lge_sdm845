@@ -982,6 +982,7 @@ unsigned int sugov_restore_freq(unsigned long data)
 static struct cpufreq_governor schedutil_gov = {
 	.name = "schedutil",
 	.owner = THIS_MODULE,
+	.dynamic_switching = true,
 	.init = sugov_init,
 	.exit = sugov_exit,
 	.start = sugov_start,
