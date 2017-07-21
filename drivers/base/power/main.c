@@ -449,7 +449,7 @@ static const struct file_operations resume_time_fops = {
 };
 #endif
 
-static void dpm_show_time(ktime_t starttime, pm_message_t state, char *info)
+static void dpm_show_time(ktime_t starttime, pm_message_t state, int error, char *info)
 {
 #if defined(CONFIG_MACH_LGE)
 	struct timespec time;
@@ -467,8 +467,9 @@ static void dpm_show_time(ktime_t starttime, pm_message_t state, char *info)
 	if (usecs == 0)
 		usecs = 1;
 	pr_info("PM: %s%s%s of devices complete after %ld.%03ld msecs\n",
-		info ?: "", info ? " " : "", pm_verb(state.event),
-		usecs / USEC_PER_MSEC, usecs % USEC_PER_MSEC);
+                  info ?: "", info ? " " : "", pm_verb(state.event),
+                  error ? "aborted" : "complete",
+                  usecs / USEC_PER_MSEC, usecs % USEC_PER_MSEC);
 #if defined(CONFIG_MACH_LGE)
 	if (!create_debugfs) {
 		debugfs_resume_time = debugfs_create_file("resume_time",
@@ -744,7 +745,7 @@ void dpm_resume_noirq(pm_message_t state)
 	}
 	mutex_unlock(&dpm_list_mtx);
 	async_synchronize_full();
-	dpm_show_time(starttime, state, "noirq");
+	dpm_show_time(starttime, state, 0, "noirq");
 	resume_device_irqs();
 	device_wakeup_disarm_wake_irqs();
 	trace_suspend_resume(TPS("dpm_resume_noirq"), state.event, false);
@@ -889,7 +890,7 @@ void dpm_resume_early(pm_message_t state)
 	}
 	mutex_unlock(&dpm_list_mtx);
 	async_synchronize_full();
-	dpm_show_time(starttime, state, "early");
+	dpm_show_time(starttime, state, 0, "early");
 	trace_suspend_resume(TPS("dpm_resume_early"), state.event, false);
 }
 
@@ -1110,7 +1111,7 @@ void dpm_resume(pm_message_t state)
 	}
 	mutex_unlock(&dpm_list_mtx);
 	async_synchronize_full();
-	dpm_show_time(starttime, state, NULL);
+	dpm_show_time(starttime, state, 0, NULL);
 
 	cpufreq_resume();
 	trace_suspend_resume(TPS("dpm_resume"), state.event, false);
@@ -1388,9 +1389,8 @@ int dpm_suspend_noirq(pm_message_t state)
 		suspend_stats.failed_suspend_noirq++;
 		dpm_save_failed_step(SUSPEND_SUSPEND_NOIRQ);
 		dpm_resume_noirq(resume_event(state));
-	} else {
-		dpm_show_time(starttime, state, "noirq");
 	}
+	dpm_show_time(starttime, state, error, "noirq");
 	trace_suspend_resume(TPS("dpm_suspend_noirq"), state.event, false);
 	return error;
 }
@@ -1542,9 +1542,8 @@ int dpm_suspend_late(pm_message_t state)
 		suspend_stats.failed_suspend_late++;
 		dpm_save_failed_step(SUSPEND_SUSPEND_LATE);
 		dpm_resume_early(resume_event(state));
-	} else {
-		dpm_show_time(starttime, state, "late");
 	}
+	dpm_show_time(starttime, state, error, "late");
 	trace_suspend_resume(TPS("dpm_suspend_late"), state.event, false);
 	return error;
 }
@@ -1839,8 +1838,8 @@ int dpm_suspend(pm_message_t state)
 	if (error) {
 		suspend_stats.failed_suspend++;
 		dpm_save_failed_step(SUSPEND_SUSPEND);
-	} else
-		dpm_show_time(starttime, state, NULL);
+	}
+	dpm_show_time(starttime, state, error, NULL);
 	trace_suspend_resume(TPS("dpm_suspend"), state.event, false);
 	return error;
 }
