@@ -7657,7 +7657,7 @@ static inline int find_best_target(struct task_struct *p, int *backup_cpu,
 			if ((capacity_orig - new_util) < target_max_spare_cap)
 				continue;
 
-			target_max_spare_cap = capacity_orig - new_util;
+			target_max_spare_cap = spare_cap;
 			target_capacity = capacity_orig;
 			target_util = new_util;
 			target_cpu = i;
