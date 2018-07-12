@@ -220,4 +220,5 @@ source "drivers/broadcast/Kconfig"
 
 source "drivers/gud/Kconfig"
 
+source "drivers/energy_model/Kconfig"
 endmenu
