@@ -7361,6 +7361,24 @@ retry:
 			 */
 			if (best_idle_cpu != -1)
 				break;
+		/*
+		 * For placement boost (or otherwise), we start with group
+		 * where the task should be placed. When
+		 * placement boost is active, and we are not at the highest
+		 * capacity group reset the target_capacity to keep
+		 * traversing to other higher clusters.
+		 * If we already are at the highest capacity cluster we skip
+		 * going around to the lower capacity cluster if we've found
+		 * a cpu.
+		 */
+		if (fbt_env->placement_boost) {
+			if (capacity_orig_of(group_first_cpu(sg)) <
+				capacity_orig_of(group_first_cpu(sg->next)))
+				target_capacity = ULONG_MAX;
+			else
+				if (target_cpu != -1 || best_idle_cpu != -1)
+					break;
+		}
 
 			if (fbt_env->placement_boost != SCHED_BOOST_NONE) {
 				target_capacity = ULONG_MAX;
