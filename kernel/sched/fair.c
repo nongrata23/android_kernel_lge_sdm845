@@ -7076,6 +7076,7 @@ static inline int find_best_target(struct task_struct *p, int *backup_cpu,
 	unsigned int active_cpus_count = 0;
 	int isolated_candidate = -1;
 	int prev_cpu = task_cpu(p);
+	bool next_group_higher_cap = false;
 
 	*backup_cpu = -1;
 
@@ -7362,6 +7363,10 @@ retry:
 			 */
 			if (best_idle_cpu != -1)
 				break;
+
+		next_group_higher_cap = (capacity_orig_of(group_first_cpu(sg)) <
+			capacity_orig_of(group_first_cpu(sg->next)));
+
 		/*
 		 * For placement boost (or otherwise), we start with group
 		 * where the task should be placed. When
@@ -7377,7 +7382,9 @@ retry:
 				capacity_orig_of(group_first_cpu(sg->next)))
 				target_capacity = ULONG_MAX;
 			else
-				if (target_cpu != -1 || best_idle_cpu != -1)
+				if (!prefer_idle &&
+                                       (target_cpu != -1 || best_idle_cpu != -1) &&
+                                !next_group_higher_cap)))
 					break;
 		}
 
@@ -7404,6 +7411,21 @@ retry:
 		 */
 		if (target_capacity != ULONG_MAX)
 			break;
+
+		/*
+		 * if we are in prefer_idle and have found an idle cpu,
+		 * break from searching more groups based on the stune.boost and
+		 * group cpu capacity.
+		 */
+		if (prefer_idle && best_idle_cpu != -1) {
+			if (boosted) {
+				if (!next_group_higher_cap)
+					break;
+			} else {
+				if (next_group_higher_cap)
+					break;
+			}
+		}
 
 	} while (sg = sg->next, sg != sd->groups);
 
