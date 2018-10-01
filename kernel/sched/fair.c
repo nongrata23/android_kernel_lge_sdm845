@@ -7384,8 +7384,9 @@ retry:
 			else
 				if (!prefer_idle &&
                                        (target_cpu != -1 || best_idle_cpu != -1) &&
-                                !next_group_higher_cap)))
-					break;
+                                       sched_boost() != FULL_THROTTLE_BOOST ||
+                                                !next_group_higher_cap)
+                              		break;
 		}
 
 			if (fbt_env->placement_boost != SCHED_BOOST_NONE) {
