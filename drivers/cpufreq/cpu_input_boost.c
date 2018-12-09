@@ -57,6 +57,8 @@ module_param(dynamic_stune_boost, short, 0644);
 
 module_param(dynamic_sched_boost, bool, 0644);
 
+unsigned long last_input_time;
+
 /* Available bits for boost state */
 enum {
 	SCREEN_OFF,
@@ -331,6 +333,7 @@ static void cpu_input_boost_input_event(struct input_handle *handle,
 	__cpu_input_boost_kick(b);
 
 	b->last_input_jiffies = jiffies;
+	last_input_time = jiffies;
 }
 
 static int cpu_input_boost_input_connect(struct input_handler *handler,
