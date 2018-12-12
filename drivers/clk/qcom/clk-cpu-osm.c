@@ -98,6 +98,7 @@ struct clk_osm {
 	u32 mx_turbo_freq;
 	ktime_t last_update;
 	struct mutex update_lock;
+	cpumask_t related_cpus;
 };
 
 static inline struct clk_osm *to_clk_osm(struct clk_hw *_hw)
@@ -639,7 +640,7 @@ static struct clk_osm *osm_configure_policy(struct cpufreq_policy *policy)
 		if (parent != c_parent)
 			continue;
 
-		cpumask_set_cpu(cpu, policy->cpus);
+		cpumask_set_cpu(cpu, &c->related_cpus);
 		if (n->core_num == 0)
 			first = n;
 	}
@@ -858,6 +859,8 @@ static int osm_cpufreq_cpu_init(struct cpufreq_policy *policy)
 	policy->driver_data = c;
 
 	kfree(of_table);
+	cpumask_copy(policy->cpus, &c->related_cpus);
+
 	return 0;
 
 err:
