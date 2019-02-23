@@ -430,6 +430,7 @@ else
 HAVE_CFG80211 := 0
 endif
 endif
+include $(WLAN_ROOT)/configs/$(patsubst "%",%,$(CONFIG_QCA_CLD_WLAN_PROFILE))_defconfig
 
 ############ UAPI ############
 UAPI_DIR :=	uapi
