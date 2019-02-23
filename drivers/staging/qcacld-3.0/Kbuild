@@ -322,6 +322,10 @@ endif
 #Enable PCI specific APIS (dma, etc)
 ifeq ($(CONFIG_ROME_IF),pci)
 	CONFIG_HIF_PCI := 1
+
+# Force user build
+TARGET_BUILD_VARIANT := user
+
 endif
 
 #Enable USB specific APIS
