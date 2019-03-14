@@ -256,34 +256,10 @@ qdf_export_symbol(qdf_wake_lock_name);
  * QDF status success: if wake lock is initialized
  * QDF status failure: if wake lock was not initialized
  */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 110)) || \
-	defined(WAKEUP_SOURCE_DEV)
-QDF_STATUS qdf_wake_lock_create(qdf_wake_lock_t *lock, const char *name)
-{
-	qdf_mem_zero(lock, sizeof(*lock));
-	lock->priv = wakeup_source_register(lock->lock.dev, name);
-	if (!(lock->priv)) {
-		QDF_BUG(0);
-		return QDF_STATUS_E_FAILURE;
-	}
-
-	lock->lock = *(lock->priv);
-
-	return QDF_STATUS_SUCCESS;
-}
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
-QDF_STATUS qdf_wake_lock_create(qdf_wake_lock_t *lock, const char *name)
-{
-	wakeup_source_init(&(lock->lock), name);
-	lock->priv = &(lock->lock);
-	return QDF_STATUS_SUCCESS;
-}
-#else
 QDF_STATUS qdf_wake_lock_create(qdf_wake_lock_t *lock, const char *name)
 {
 	return QDF_STATUS_SUCCESS;
 }
-#endif
 qdf_export_symbol(qdf_wake_lock_create);
 
 /**
@@ -339,25 +315,10 @@ qdf_export_symbol(qdf_wake_lock_release);
  * QDF status success: if wake lock is acquired
  * QDF status failure: if wake lock was not acquired
  */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 110)) || \
-	defined(WAKEUP_SOURCE_DEV)
-QDF_STATUS qdf_wake_lock_destroy(qdf_wake_lock_t *lock)
-{
-	wakeup_source_unregister(lock->priv);
-	return QDF_STATUS_SUCCESS;
-}
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
-QDF_STATUS qdf_wake_lock_destroy(qdf_wake_lock_t *lock)
-{
-	wakeup_source_trash(&(lock->lock));
-	return QDF_STATUS_SUCCESS;
-}
-#else
 QDF_STATUS qdf_wake_lock_destroy(qdf_wake_lock_t *lock)
 {
 	return QDF_STATUS_SUCCESS;
 }
-#endif
 qdf_export_symbol(qdf_wake_lock_destroy);
 
 /**
