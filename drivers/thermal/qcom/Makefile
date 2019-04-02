@@ -4,7 +4,7 @@ obj-$(CONFIG_MSM_BCL_PERIPHERAL_CTL) += bcl_peripheral.o
 obj-$(CONFIG_QTI_THERMAL_LIMITS_DCVS) += msm_lmh_dcvs.o
 
 ifdef CONFIG_DEBUG_KERNEL
-obj-$(CONFIG_QTI_THERMAL_LIMITS_DCVS) += lmh_dbg.o
+obj-y += msm_lmh_dcvs.o lmh_dbg.o
 endif
 
 obj-$(CONFIG_QTI_VIRTUAL_SENSOR) += qti_virtual_sensor.o
