@@ -1,24 +1,7 @@
-/*
- * Completely Fair Scheduling (CFS) Class (SCHED_NORMAL/SCHED_BATCH)
- *
- *  Copyright (C) 2007 Red Hat, Inc., Ingo Molnar <mingo@redhat.com>
- *
- *  Interactivity improvements by Mike Galbraith
- *  (C) 2007 Mike Galbraith <efault@gmx.de>
- *
- *  Various enhancements by Dmitry Adamushko.
- *  (C) 2007 Dmitry Adamushko <dmitry.adamushko@gmail.com>
- *
- *  Group scheduling enhancements by Srivatsa Vaddagiri
- *  Copyright IBM Corporation, 2007
- *  Author: Srivatsa Vaddagiri <vatsa@linux.vnet.ibm.com>
- *
- *  Scaled math optimizations by Thomas Gleixner
- *  Copyright (C) 2007, Thomas Gleixner <tglx@linutronix.de>
- *
- *  Adaptive scheduling granularity, math enhancements by Peter Zijlstra
- *  Copyright (C) 2007 Red Hat, Inc., Peter Zijlstra
- */
+/* * Completely Fair Scheduling (CFS) Class (SCHED_NORMAL/SCHED_BATCH) * * Copyright (C) 2007 Red Hat, Inc., Ingo Molnar <mingo@redhat.com> * * Interactivity improvements by Mike Galbraith * (C) 2007 
+ Mike Galbraith <efault@gmx.de> * * Various enhancements by Dmitry Adamushko. * (C) 2007 Dmitry Adamushko <dmitry.adamushko@gmail.com> * * Group scheduling enhancements by Srivatsa Vaddagiri * 
+ Copyright IBM Corporation, 2007 * Author: Srivatsa Vaddagiri <vatsa@linux.vnet.ibm.com> * * Scaled math optimizations by Thomas Gleixner * Copyright (C) 2007, Thomas Gleixner <tglx@linutronix.de> * 
+ * Adaptive scheduling granularity, math enhancements by Peter Zijlstra * Copyright (C) 2007 Red Hat, Inc., Peter Zijlstra */
 
 #include <linux/sched.h>
 #include <linux/latencytop.h>
@@ -7219,11 +7202,11 @@ struct find_best_target_env {
 static bool is_packing_eligible(struct task_struct *p, int target_cpu,
 				struct find_best_target_env *fbt_env,
 				unsigned int target_cpus_count,
-				int best_idle_cstate)
+				int best_idle_cstate, bool boosted)
 {
 	unsigned long tutil, estimated_capacity;
 
-	if (fbt_env->placement_boost || fbt_env->need_idle)
+	if (fbt_env->placement_boost || fbt_env->need_idle || boosted)
 		return false;
 
 	if (best_idle_cstate == -1)
@@ -7671,7 +7654,7 @@ static inline int find_best_target(struct task_struct *p, int *backup_cpu,
 		return best_idle_cpu;
 
 	if (best_idle_cpu != -1 && !is_packing_eligible(p, target_cpu, fbt_env,
-					active_cpus_count, best_idle_cstate)) {
+					active_cpus_count, best_idle_cstate, boosted)) {
 
 		target_cpu = best_idle_cpu;
 		best_idle_cpu = -1;
