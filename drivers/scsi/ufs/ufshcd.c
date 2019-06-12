@@ -11007,6 +11007,7 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 	ufsdbg_tunables_add_debugfs(hba, hba->debugfs_files.debugfs_root);
 #endif
 
+	device_enable_async_suspend(dev);
 
 	return 0;
 
