@@ -2688,6 +2688,7 @@ static struct adreno_irq a6xx_irq = {
 	.mask = A6XX_INT_MASK,
 };
 
+#if 0
 static struct adreno_snapshot_sizes a6xx_snap_sizes = {
 	.cp_pfp = 0x33,
 	.roq = 0x400,
@@ -3110,6 +3111,7 @@ static struct adreno_coresight a6xx_coresight_cx = {
 	.count = ARRAY_SIZE(a6xx_coresight_regs_cx),
 	.groups = a6xx_coresight_groups_cx,
 };
+#endif
 
 static struct adreno_perfcount_register a6xx_perfcounters_cp[] = {
 	{ KGSL_PERFCOUNTER_NOT_USED, 0, 0, A6XX_RBBM_PERFCTR_CP_0_LO,
