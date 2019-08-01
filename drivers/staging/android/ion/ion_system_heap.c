@@ -809,6 +809,7 @@ void ion_system_heap_destroy(struct ion_heap *heap)
 	kfree(sys_heap->uncached_pools);
 	kfree(sys_heap->cached_pools);
 	kfree(sys_heap);
+	kmem_cache_destroy(ion_page_info_pool);
 }
 
 static int ion_system_contig_heap_allocate(struct ion_heap *heap,
