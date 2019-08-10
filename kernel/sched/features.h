@@ -114,3 +114,9 @@ SCHED_FEAT(EAS_USE_NEED_IDLE, false)
  * active costs of CPUs.
  */
 SCHED_FEAT(EAS_SIMPLIFIED_EM, true)
+/*
+ * Inflate the effective utilization of SchedTune-boosted tasks, which
+ * generally leads to usage of higher frequencies.
+ * If disabled, boosts will only bias tasks to higher-capacity CPUs.
+ */
+SCHED_FEAT(SCHEDTUNE_BOOST_UTIL, true)
