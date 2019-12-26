@@ -17,6 +17,7 @@
 #include <linux/utsname.h>
 #include <linux/mempolicy.h>
 #include <linux/debugfs.h>
+#include <linux/nmi.h>
 
 #include "sched.h"
 #include "walt.h"
@@ -817,9 +818,16 @@ void sysrq_sched_debug_show(void)
 	int cpu;
 
 	sched_debug_header(NULL);
-	for_each_online_cpu(cpu)
+	for_each_online_cpu(cpu) {
+		/*
+		 * Need to reset softlockup watchdogs on all CPUs, because
+		 * another CPU might be blocked waiting for us to process
+		 * an IPI or stop_machine.
+		 */
+		touch_nmi_watchdog();
+		touch_all_softlockup_watchdogs();
 		print_cpu(NULL, cpu);
-
+	}
 }
 
 /*
