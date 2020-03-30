@@ -86,3 +86,7 @@ obj-$(CONFIG_RMNET_DATA) += rmnet_data/
 obj-$(CONFIG_IPC_ROUTER)	+= ipc_router/
 #This API is only for checking patch code ID.
 obj-y                       += patchcodeid.o
+
+# optimise for size
+subdir-ccflags-y += $(call cc-option, -g0)
+subdir-ccflags-y += $(call cc-option, -Os)
