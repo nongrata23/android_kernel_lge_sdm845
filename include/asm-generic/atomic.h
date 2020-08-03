@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2007 Red Hat, Inc. All Rights Reserved.
  * Written by David Howells (dhowells@redhat.com)
- *
+ * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public Licence
  * as published by the Free Software Foundation; either version
@@ -131,6 +131,11 @@ ATOMIC_FETCH_OP(add, +)
 #ifndef atomic_fetch_sub
 ATOMIC_FETCH_OP(sub, -)
 #endif
+
+#ifndef cpu_relaxed_read_atomic
+#define cpu_relaxed_read_atomic(v) atomic_read(v)
+#endif
+
 
 #ifndef atomic_fetch_and
 ATOMIC_FETCH_OP(and, &)
