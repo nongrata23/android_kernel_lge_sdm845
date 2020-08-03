@@ -43,7 +43,7 @@
 #include <asm/pgtable-hwdef.h>
 #include <asm/ptrace.h>
 #include <asm/types.h>
-#include <asm/atomic.h>
+#include <asm/relaxed.h>
 
 /*
  * TASK_SIZE - the maximum size of a user space task.
@@ -186,8 +186,6 @@ static inline void cpu_relax(void)
 
 #define cpu_relax_lowlatency()                cpu_relax()
 
-#define cpu_relaxed_read(p)		ldax32(p)
-#define cpu_relaxed_read_long(p)	ldax64((u64 *)p)
 #define cpu_read_relax()		wfe()
 
 
