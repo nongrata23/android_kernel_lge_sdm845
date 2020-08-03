@@ -89,21 +89,12 @@ void devfreq_boost_kick_max(enum df_device device, unsigned int duration_ms)
 	if (!d)
 		return;
 
-	if (!is_display_on())
-		return;
-
 	__devfreq_boost_kick_max(d->devices + device, duration_ms);
 }
 
 void devfreq_boost_kick_wake(enum df_device device)
 {
-	struct df_boost_drv *d = df_boost_drv_g;
-
-	if (!d)
-		return;
-
-	__devfreq_boost_kick_max(d->devices + device,
-				 CONFIG_DEVFREQ_WAKE_BOOST_DURATION_MS);
+	devfreq_boost_kick_max(device, CONFIG_DEVFREQ_WAKE_BOOST_DURATION_MS);
 }
 
 void devfreq_register_boost_device(enum df_device device, struct devfreq *df)
