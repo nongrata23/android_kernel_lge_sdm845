@@ -27,7 +27,7 @@ struct boost_dev {
 struct df_boost_drv {
 	struct boost_dev devices[DEVFREQ_MAX];
 	struct notifier_block msm_drm_notif;
-	atomic_t screen_awake;
+	bool screen_awake;
 };
 
 static struct df_boost_drv *df_boost_drv_g __read_mostly;
@@ -53,7 +53,7 @@ void devfreq_boost_kick(enum df_device device)
 	if (!d)
 		return;
 
-	if (!atomic_read(&d->screen_awake))
+	if (!d->screen_awake)
 		return;
 
 	__devfreq_boost_kick(d->devices + device);
@@ -89,16 +89,10 @@ void devfreq_boost_kick_max(enum df_device device, unsigned int duration_ms)
 	if (!d)
 		return;
 
-	if (!atomic_read(&d->screen_awake))
+	if (!is_display_on())
 		return;
 
 	__devfreq_boost_kick_max(d->devices + device, duration_ms);
-}
-
-static void __devfreq_boost_kick_wake(struct boost_dev *b)
-{
-	__devfreq_boost_kick_max(b,
-				 CONFIG_DEVFREQ_WAKE_BOOST_DURATION_MS);
 }
 
 void devfreq_boost_kick_wake(enum df_device device)
@@ -108,10 +102,8 @@ void devfreq_boost_kick_wake(enum df_device device)
 	if (!d)
 		return;
 
-	if (atomic_read(&d->screen_awake))
-		return;
-
-	__devfreq_boost_kick_wake(d->devices + device);
+	__devfreq_boost_kick_max(d->devices + device,
+				 CONFIG_DEVFREQ_WAKE_BOOST_DURATION_MS);
 }
 
 void devfreq_register_boost_device(enum df_device device, struct devfreq *df)
@@ -263,20 +255,19 @@ static int msm_drm_notifier_cb(struct notifier_block *nb,
 	struct df_boost_drv *d = container_of(nb, typeof(*d), msm_drm_notif);
 	struct msm_drm_notifier *evdata = data;
 	int *blank = evdata->data;
-	bool screen_awake;
 
 	/* Parse framebuffer blank events as soon as they occur */
 	if (action != MSM_DRM_EARLY_EVENT_BLANK)
 		return NOTIFY_OK;
 
 	/* Boost when the screen turns on and unboost when it turns off */
-	screen_awake = *blank == MSM_DRM_BLANK_UNBLANK;
-	atomic_set(&d->screen_awake, screen_awake);
-	if (screen_awake) {
+	d->screen_awake = *blank == MSM_DRM_BLANK_UNBLANK;
+	if (d->screen_awake) {
 		int i;
 
 		for (i = 0; i < DEVFREQ_MAX; i++)
-			__devfreq_boost_kick_wake(d->devices + i);
+			__devfreq_boost_kick_max(d->devices + i,
+				CONFIG_DEVFREQ_WAKE_BOOST_DURATION_MS);
 	} else {
 		devfreq_unboost_all(d);
 	}
@@ -291,7 +282,7 @@ static void devfreq_boost_input_event(struct input_handle *handle,
 	struct df_boost_drv *d = handle->handler->private;
 	int i;
 
-	if (!atomic_read(&d->screen_awake))
+	if (!d->screen_awake)
 		return;
 
 	for (i = 0; i < DEVFREQ_MAX; i++)
