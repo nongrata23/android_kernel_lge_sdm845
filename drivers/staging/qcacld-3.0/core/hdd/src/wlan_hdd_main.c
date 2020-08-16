@@ -12603,13 +12603,6 @@ static int hdd_module_init(void)
 
 	return ret;
 }
-
-	ret = wlan_hdd_state_ctrl_param_create();
-	if (ret)
-		pr_err("wlan_hdd_state_create:%x\n", ret);
-
-	return ret;
-}
 /**
  * hdd_module_exit() - Exit function
  *
