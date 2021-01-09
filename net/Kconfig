@@ -198,7 +198,7 @@ config BRIDGE_NETFILTER
 	depends on BRIDGE
 	depends on NETFILTER && INET
 	depends on NETFILTER_ADVANCED
-	default m
+	defualt y
 	---help---
 	  Enabling this option will let arptables resp. iptables see bridged
 	  ARP resp. IP traffic. If you want a bridging firewall, you probably
@@ -433,7 +433,7 @@ config NET_DEVLINK
 
 config MAY_USE_DEVLINK
 	tristate
-	default m if NET_DEVLINK=m
+	defualt m if NET_DEVLINK=m
 	default y if NET_DEVLINK=y || NET_DEVLINK=n
 	help
 	  Drivers using the devlink infrastructure should have a dependency
