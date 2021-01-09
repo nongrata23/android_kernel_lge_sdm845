@@ -121,3 +121,7 @@ kernel/configs/android-*.cfg
 
 #ignore out 
 out/
+#
+#Ignoring Android.bp link file
+#
+Android.bp
