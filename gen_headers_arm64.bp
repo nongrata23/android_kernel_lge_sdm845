@@ -39,8 +39,6 @@ gen_headers_exclude_srcs_arm64 = [
     "include/uapi/linux/wil6210_uapi.h",
     "include/uapi/rdma/qedr-abi.h",
     "include/uapi/video/adf.h",
-    "include/uapi/linux/cifs/cifs_mount.h",
-    "include/uapi/linux/genwqe/genwqe_card.h",
     "include/uapi/linux/netfilter/xt_HARDIDLETIMER.h",
     "include/uapi/linux/usb/f_accessory.h",
     "include/uapi/linux/usb/f_mtp.h",
@@ -921,6 +919,9 @@ gen_headers_out_arm64 = [
     "asm/statfs.h",
     "asm/ucontext.h",
     "asm/unistd.h",
+    "linux/lib_lge_triton.h",
+	"linux/cifs/cifs_mount.h",
+	"linux/genwqe/genwqe_card.h",
 ]
 
 genrule {
