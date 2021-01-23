@@ -3510,7 +3510,6 @@ static bool cfq_may_dispatch(struct cfq_data *cfqd, struct cfq_queue *cfqq)
 	 */
 	if (cfqd->rq_in_flight[BLK_RW_SYNC] && !cfq_cfqq_sync(cfqq))
 		return false;
-
 	max_dispatch = max_t(unsigned int, cfqd->cfq_quantum / 2, 1);
 	if (cfq_class_idle(cfqq))
 		max_dispatch = 1;

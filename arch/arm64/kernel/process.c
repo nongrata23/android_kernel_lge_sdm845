@@ -1,3 +1,4 @@
+
 /*
  * Based on arch/arm/kernel/process.c
  *
@@ -251,9 +252,6 @@ static void show_extra_register_data(struct pt_regs *regs, int nbytes)
 {
 	mm_segment_t fs;
 
-#ifdef CONFIG_MACH_LGE
-	console_uart_disable();
-#endif
 	fs = get_fs();
 	set_fs(KERNEL_DS);
 	show_data(regs->pc - nbytes, nbytes * 2, "PC");
@@ -274,9 +272,6 @@ static void show_extra_register_data(struct pt_regs *regs, int nbytes)
 	}
 	set_fs(fs);
 
-#ifdef CONFIG_MACH_LGE
-	console_uart_enable();
-#endif
 }
 
 void __show_regs(struct pt_regs *regs)

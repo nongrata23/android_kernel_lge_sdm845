@@ -4335,12 +4335,6 @@ no_journal:
 cantfind_ext4:
 	if (!silent)
 		ext4_msg(sb, KERN_ERR, "VFS: Can't find ext4 filesystem");
-#ifdef CONFIG_MACH_LGE
-	/* LGE_CHANGE, BSP-FS@lge.com
-	   add return code if ext4 superblock is damaged
-	*/
-	ret=-ESUPER;
-#endif
 	goto failed_mount;
 
 #ifdef CONFIG_QUOTA
