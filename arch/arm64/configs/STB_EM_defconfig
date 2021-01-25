@@ -55,7 +55,7 @@ CONFIG_IOSCHED_NOOP=y
 # Library routines
 #
 
-CONFIG_AUDIT=y
+# CONFIG_AUDIT is not set
 # CONFIG_AUDITSYSCALL is not set
 CONFIG_QMI_ENCDEC=y
 # CONFIG_LOCALVERSION_AUTO is not set
