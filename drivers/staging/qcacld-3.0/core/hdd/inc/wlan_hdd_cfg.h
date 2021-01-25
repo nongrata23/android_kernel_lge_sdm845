@@ -952,7 +952,7 @@ enum hdd_dot11_mode {
 #define CFG_DROP_BCN_ON_CHANNEL_MISMATCH      "drop_bcn_on_chan_mismatch"
 #define CFG_DROP_BCN_ON_CHANNEL_MISMATCH_MIN       (0)
 #define CFG_DROP_BCN_ON_CHANNEL_MISMATCH_MAX       (1)
-#define CFG_DROP_BCN_ON_CHANNEL_MISMATCH_DEFAULT   (1)
+#define CFG_DROP_BCN_ON_CHANNEL_MISMATCH_DEFAULT   (0)
 
 /*
  * <ini>
@@ -5581,7 +5581,7 @@ enum hdd_link_speed_rpt_type {
 #define CFG_REPORT_MAX_LINK_SPEED                  "gReportMaxLinkSpeed"
 #define CFG_REPORT_MAX_LINK_SPEED_MIN              (eHDD_LINK_SPEED_REPORT_ACTUAL)
 #define CFG_REPORT_MAX_LINK_SPEED_MAX              (eHDD_LINK_SPEED_REPORT_MAX_SCALED)
-#define CFG_REPORT_MAX_LINK_SPEED_DEFAULT          (eHDD_LINK_SPEED_REPORT_MAX_SCALED)   // LGE_PATCH
+#define CFG_REPORT_MAX_LINK_SPEED_DEFAULT          (eHDD_LINK_SPEED_REPORT_ACTUAL)
 
 /*
  * <ini>
@@ -8969,7 +8969,7 @@ enum hdd_link_speed_rpt_type {
 #define CFG_SAP_11AC_OVERRIDE_NAME             "gSAP11ACOverride"
 #define CFG_SAP_11AC_OVERRIDE_MIN              (0)
 #define CFG_SAP_11AC_OVERRIDE_MAX              (1)
-#define CFG_SAP_11AC_OVERRIDE_DEFAULT          (1) // LGE patch
+#define CFG_SAP_11AC_OVERRIDE_DEFAULT          (0)
 
 /*
  * <ini>
@@ -15220,8 +15220,7 @@ enum hdd_external_acs_policy {
 #define CFG_BTM_ENABLE_NAME      "btm_offload_config"
 #define CFG_BTM_ENABLE_MIN       (0x00000000)
 #define CFG_BTM_ENABLE_MAX       (0xffffffff)
-#define CFG_BTM_ENABLE_DEFAULT   (0x00000000)  // LGE_CHANGE, SDM845 temporal deactivationo of BTM_ENABLE_DEFAULT.
-
+#define CFG_BTM_ENABLE_DEFAULT   (0x00000001)
 
 /*
  * <ini>
@@ -17798,7 +17797,7 @@ enum hdd_external_acs_policy {
 #define CFG_BMISS_SKIP_FULL_SCAN               "bmiss_skip_full_scan"
 #define CFG_BMISS_SKIP_FULL_SCAN_MIN           0
 #define CFG_BMISS_SKIP_FULL_SCAN_MAX           1
-#define CFG_BMISS_SKIP_FULL_SCAN_DEFAULT       1  // LGE patch
+#define CFG_BMISS_SKIP_FULL_SCAN_DEFAULT       0
 
 #ifdef WLAN_FEATURE_PERIODIC_STA_STATS
 /*

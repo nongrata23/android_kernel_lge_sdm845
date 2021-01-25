@@ -1238,27 +1238,6 @@ lim_send_assoc_rsp_mgmt_frame(tpAniSirGlobal mac_ctx,
 			populate_dot11f_vht_operation(mac_ctx, pe_session,
 					&frm.VHTOperation);
 			is_vht = true;
-//LGE_PATCH
-		} else {
-// LGE_CHANGE_START, 2017.0628, neo-wifi@lge.com, Assoc response 2x2 in SAP mode, QCT Case 03003077
-#if 0
-            /* Advertise 1x1 if either is HT-STA */
-            if (frm.HTCaps.present && mac_ctx->hw_dbs_capable)
-                frm.HTCaps.supportedMCSSet[1] = 0;
-#else
-           /*
-            * 2G-AS platform: SAP associates with HT (11n)clients
-            * as 2x1 in 2G and 2X2 in 5G
-            * Non-2G-AS platform: SAP associates with HT (11n)
-            * clients as 2X2 in 2G and 5G
-            * 5G-AS: Don?t care
-            */
-           if (frm.HTCaps.present && mac_ctx->hw_dbs_capable &&
-               mac_ctx->lteCoexAntShare &&
-               IS_24G_CH(pe_session->currentOperChannel))
-                frm.HTCaps.supportedMCSSet[1] = 0;
-#endif
-// LGE_CHANGE_END, 2017.0628, neo-wifi@lge.com, Assoc response 2x2 in SAP mode, QCT Case 03003077
 		}
 
 		if (pe_session->vhtCapability &&
@@ -5176,8 +5155,10 @@ static void lim_tx_mgmt_frame(tpAniSirGlobal mac_ctx,
 	MTRACE(qdf_trace(QDF_MODULE_ID_PE, TRACE_CODE_TX_COMPLETE,
 		session->peSessionId, qdf_status));
 	if (!QDF_IS_STATUS_SUCCESS(qdf_status)) {
+#ifdef WLAN_DEBUG
 		pe_err("*** Could not send Auth frame (subType: %d), retCode=%X ***",
 			fc->subType, qdf_status);
+#endif
 		mac_ctx->auth_ack_status = LIM_AUTH_ACK_RCD_FAILURE;
 		auth_ack_status = SENT_FAIL;
 		lim_diag_event_report(mac_ctx, WLAN_PE_DIAG_AUTH_ACK_EVENT,

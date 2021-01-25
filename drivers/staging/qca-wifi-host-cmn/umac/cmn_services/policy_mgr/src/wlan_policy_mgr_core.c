@@ -32,10 +32,6 @@
 
 #define POLICY_MGR_MAX_CON_STRING_LEN   100
 
-#ifdef FEATURE_SUPPORT_LGE
-int is_dbs = 0;
-#endif //FEATURE_SUPPORT_LGE
-
 struct policy_mgr_conc_connection_info
 	pm_conc_connection_list[MAX_NUMBER_OF_CONC_CONNECTIONS];
 
@@ -1136,9 +1132,6 @@ void policy_mgr_dump_current_concurrency(struct wlan_objmgr_psoc *psoc)
 	char cc_mode[POLICY_MGR_MAX_CON_STRING_LEN] = {0};
 	uint32_t count = 0;
 	struct policy_mgr_psoc_priv_obj *pm_ctx;
-#ifdef FEATURE_SUPPORT_LGE
-	int cur_dbs_mode = 0;
-#endif //FEATURE_SUPPORT_LGE
 
 	pm_ctx = policy_mgr_get_context(psoc);
 	if (!pm_ctx) {
@@ -1164,12 +1157,8 @@ void policy_mgr_dump_current_concurrency(struct wlan_objmgr_psoc *psoc)
 		} else if (pm_conc_connection_list[0].mac ==
 					pm_conc_connection_list[1].mac) {
 			strlcat(cc_mode, " MCC", sizeof(cc_mode));
-		} else {
+		} else
 			strlcat(cc_mode, " DBS", sizeof(cc_mode));
-#ifdef FEATURE_SUPPORT_LGE
-			cur_dbs_mode = 1;
-#endif //FEATURE_SUPPORT_LGE
-		}
 		qdf_mutex_release(&pm_ctx->qdf_conc_list_lock);
 		policy_mgr_debug("%s", cc_mode);
 		break;
@@ -1192,9 +1181,6 @@ void policy_mgr_dump_current_concurrency(struct wlan_objmgr_psoc *psoc)
 					strlcat(cc_mode, " MCC on single MAC",
 						sizeof(cc_mode));
 		} else {
-#ifdef FEATURE_SUPPORT_LGE
-			cur_dbs_mode = 1;
-#endif //FEATURE_SUPPORT_LGE
 			qdf_mutex_release(&pm_ctx->qdf_conc_list_lock);
 			policy_mgr_dump_dbs_concurrency(psoc, cc_mode,
 					sizeof(cc_mode));
@@ -1206,10 +1192,6 @@ void policy_mgr_dump_current_concurrency(struct wlan_objmgr_psoc *psoc)
 			num_connections);
 		break;
 	}
-
-#ifdef FEATURE_SUPPORT_LGE
-	is_dbs = cur_dbs_mode;
-#endif //FEATURE_SUPPORT_LGE
 
 	return;
 }
@@ -3019,12 +3001,3 @@ void policy_mgr_remove_sap_mandatory_chan(struct wlan_objmgr_psoc *psoc,
 	qdf_mem_copy(pm_ctx->sap_mandatory_channels, chan_list, num_chan);
 	pm_ctx->sap_mandatory_channels_len = num_chan;
 }
-
-#ifdef FEATURE_SUPPORT_LGE
-int policy_mgr_get_dbs_mode(void);
-int policy_mgr_get_dbs_mode(void)
-{
-	return is_dbs;
-}
-#endif //FEATURE_SUPPORT_LGE
-
