@@ -1521,6 +1521,7 @@ CONFIG_PRINTK_PROCESS=y
 # CONFIG_DEBUG_INFO is not set
 CONFIG_MAGIC_SYSRQ=y
 # CONFIG_DEBUG_KERNEL is not set
+# CONFIG_DEBUG_FS is not set
 
 #
 # Debug Lockups and Hangs
