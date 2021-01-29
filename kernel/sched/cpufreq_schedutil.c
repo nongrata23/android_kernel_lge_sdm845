@@ -272,11 +272,14 @@ static unsigned long sugov_get_util(struct sugov_cpu *sg_cpu)
 	/* Add interrupt utilization */
 	util += irq;
 
-        /* Add DL bandwidth requirement */
-        util += sg_cpu->bw_dl;
+	/* Add DL bandwidth requirement */
+	util += sg_cpu->bw_dl;
 
-        return min(max, util);
+#ifdef CONFIG_UCLAMP_TASK
+	util = uclamp_util_with(rq, util, NULL);
+#endif
 
+	return min(max, util);
 }
 
 static void sugov_set_iowait_boost(struct sugov_cpu *sg_cpu, u64 time,
