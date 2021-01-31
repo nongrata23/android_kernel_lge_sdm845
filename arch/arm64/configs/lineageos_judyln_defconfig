@@ -1608,17 +1608,15 @@ CONFIG_CRYPTO_CHACHA20_NEON=y
 # LGE DM APP Support
 #
 
-CONFIG_LGE_DM_APP=y
+CONFIG_LGE_DM_APP=n
 
 
-#
-# Qualcomm Atheros CLD WLAN module
-#
 
 #
 # Qualcomm Atheros CLD WLAN module
 #
 CONFIG_QCA_CLD_WLAN=y
+CONFIG_QCA_CLD_WLAN_PROFILE="default"
 # CONFIG_QCACLD_WLAN_LFR3 is not set
 # CONFIG_PRIMA_WLAN_OKC is not set
 # CONFIG_WLAN_FEATURE_11W is not set
@@ -1648,6 +1646,8 @@ CONFIG_QCA_CLD_WLAN=y
 # CONFIG_WLAN_OBJMGR_DEBUG is not set
 # CONFIG_WLAN_FEATURE_DFS_OFFLOAD is not set
 # CONFIG_WLAN_FEATURE_SARV1_TO_SARV2 is not set
+
+
 
 #
 # Security options
