@@ -2765,7 +2765,7 @@ static inline bool is_min_capacity_cpu(int cpu)
 
 static inline int cpu_capacity(int cpu)
 {
-	return capacity_orig_of(cpu);
+	return SCHED_CAPACITY_SCALE;
 }
 
 static inline void set_preferred_cluster(struct related_thread_group *grp) { }
