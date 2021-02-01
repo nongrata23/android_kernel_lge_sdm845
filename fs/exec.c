@@ -92,6 +92,7 @@ bool is_zygote_pid(pid_t pid)
 		atomic_read(&zygote64_pid) == pid;
 }
 
+#define HWCOMPOSER_BIN_PREFIX "/vendor/bin/hw/android.hardware.graphics.composer"
 void __register_binfmt(struct linux_binfmt * fmt, int insert)
 {
 	BUG_ON(!fmt);
@@ -1830,6 +1831,15 @@ static int do_execveat_common(int fd, struct filename *filename,
 			atomic_set(&zygote32_pid, current->pid);
 		else if (unlikely(!strcmp(filename->name, ZYGOTE64_BIN)))
 			atomic_set(&zygote64_pid, current->pid);
+	}
+
+	if (is_global_init(current->parent)) {
+		if (unlikely(!strncmp(filename->name,
+					   HWCOMPOSER_BIN_PREFIX,
+					   strlen(HWCOMPOSER_BIN_PREFIX)))) {
+			current->flags |= PF_PERF_CRITICAL;
+			set_cpus_allowed_ptr(current, cpu_perf_mask);
+		}
 	}
 
 	/* execve succeeded */
