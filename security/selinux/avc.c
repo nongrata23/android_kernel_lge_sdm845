@@ -701,7 +701,7 @@ static struct avc_node *avc_insert(struct selinux_avc *avc,
 	spinlock_t *lock;
 	struct hlist_head *head;
 
-	if (avc_latest_notif_update(avd->seqno, 1))
+	if (avc_latest_notif_update(avc, avd->seqno, 1))
 		return NULL;
 
 	node = avc_alloc_node(avc);
@@ -710,7 +710,7 @@ static struct avc_node *avc_insert(struct selinux_avc *avc,
 
 	avc_node_populate(node, ssid, tsid, tclass, avd);
 	if (avc_xperms_populate(node, xp_node)) {
-		avc_node_kill(node);
+		avc_node_kill(avc, node);
 		return NULL;
 	}
 
