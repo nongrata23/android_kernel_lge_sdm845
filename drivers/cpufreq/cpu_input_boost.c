@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (C) 2018-2019 Sultan Alsawaf <sultan@kerneltoast.com>.
- * Copyright (C) 2019 Danny Lin <danny@kdrag0n.dev>.
  */
 
 #define pr_fmt(fmt) "cpu_input_boost: " fmt
@@ -51,6 +50,11 @@ module_param(remove_input_boost_freq_perf, uint, 0644);
 module_param(input_boost_duration, short, 0644);
 module_param(wake_boost_duration, short, 0644);
 
+#ifdef CONFIG_DYNAMIC_STUNE_BOOST
+static __read_mostly int stune_boost = CONFIG_TA_STUNE_BOOST;
+module_param_named(dynamic_stune_boost, stune_boost, int, 0644);
+#endif
+
 /* Available bits for boost state */
 enum {
 	SCREEN_OFF,
@@ -66,6 +70,9 @@ struct boost_drv {
 	wait_queue_head_t boost_waitq;
 	atomic_long_t max_boost_expires;
 	unsigned long state;
+
+	bool stune_active;
+	int stune_slot;
 };
 
 static void input_unboost_worker(struct work_struct *work);
@@ -132,15 +139,21 @@ static void update_online_cpu_policy(void)
 	put_online_cpus();
 }
 
-bool cpu_input_boost_within_input(unsigned long timeout_ms)
+static void update_stune_boost(struct boost_drv *b, int value)
 {
-	struct boost_drv *b = boost_drv_g;
+#ifdef CONFIG_DYNAMIC_STUNE_BOOST
+	if (value && !b->stune_active)
+		b->stune_active = !do_stune_boost("top-app", value,
+						  &b->stune_slot);
+#endif
+}
 
-	if (!b)
-		return true;
-
-	return time_before(jiffies, b->last_input_jiffies +
-			   msecs_to_jiffies(timeout_ms));
+static void clear_stune_boost(struct boost_drv *b)
+{
+#ifdef CONFIG_DYNAMIC_STUNE_BOOST
+	if (b->stune_active)
+		b->stune_active = reset_stune_boost("top-app", b->stune_slot);
+#endif
 }
 
 static void __cpu_input_boost_kick(struct boost_drv *b)
@@ -193,32 +206,7 @@ void cpu_input_boost_kick_max(unsigned int duration_ms)
 {
 	struct boost_drv *b = &boost_drv_g;
 
-	if (get_boost_state(b) & SCREEN_OFF)
-		return;
-
 	__cpu_input_boost_kick_max(b, duration_ms);
-}
-
-static void __cpu_input_boost_kick_wake(struct boost_drv *b)
-{
-	if (!(get_boost_state(b) & SCREEN_OFF))
-		return;
-
-	if (!wake_boost_duration)
-		return;
-
-	set_boost_bit(b, WAKE_BOOST);
-	__cpu_input_boost_kick_max(b, wake_boost_duration);
-}
-
-void cpu_input_boost_kick_wake(void)
-{
-	struct boost_drv *b = boost_drv_g;
-
-	if (!b)
-		return;
-
-	__cpu_input_boost_kick_wake(b);
 }
 
 static void input_unboost_worker(struct work_struct *work)
@@ -279,12 +267,18 @@ static int cpu_notifier_cb(struct notifier_block *nb, unsigned long action,
 	/* Unboost when the screen is off */
 	if (test_bit(SCREEN_OFF, &b->state)) {
 		policy->min = get_min_freq(policy);
+#ifdef CONFIG_DYNAMIC_STUNE_BOOST
+		clear_stune_boost(b);
+#endif
 		return NOTIFY_OK;
 	}
 
 	/* Boost CPU to max frequency for max boost */
 	if (test_bit(MAX_BOOST, &b->state)) {
 		policy->min = get_max_boost_freq(policy);
+#ifdef CONFIG_DYNAMIC_STUNE_BOOST
+		update_stune_boost(b, stune_boost);
+#endif
 		return NOTIFY_OK;
 	}
 
@@ -294,8 +288,15 @@ static int cpu_notifier_cb(struct notifier_block *nb, unsigned long action,
 	 */
 	if (test_bit(INPUT_BOOST, &b->state)) {
 		policy->min = get_input_boost_freq(policy);
-	else
+#ifdef CONFIG_DYNAMIC_STUNE_BOOST
+		update_stune_boost(b, stune_boost);
+#endif
+	} else {
 		policy->min = get_min_freq(policy);
+#ifdef CONFIG_DYNAMIC_STUNE_BOOST
+		clear_stune_boost(b);
+#endif
+	}
 
 	return NOTIFY_OK;
 }
@@ -329,12 +330,6 @@ static void cpu_input_boost_input_event(struct input_handle *handle,
 	struct boost_drv *b = handle->handler->private;
 
 	__cpu_input_boost_kick(b);
-
-	if (type == EV_KEY && code == KEY_POWER && value == 1 &&
-	    !(get_boost_state(b) & SCREEN_OFF))
-		__cpu_input_boost_kick_wake(b);
-
-	b->last_input_jiffies = jiffies;
 }
 
 static int cpu_input_boost_input_connect(struct input_handler *handler,
