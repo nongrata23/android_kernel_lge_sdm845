@@ -3,7 +3,6 @@
  *
  */
 
-#define DEBUG
 
 #include "dbgprint.h"
 #include "tfa_service.h"
