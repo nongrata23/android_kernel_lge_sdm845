@@ -2,7 +2,6 @@
  * Copyright 2014-2017 NXP Semiconductors
  */
 
-#define DEBUG
 
 #include "dbgprint.h"
 #include "tfa_device.h"
