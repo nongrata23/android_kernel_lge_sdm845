@@ -54,7 +54,9 @@
 extern bool is_ddic_name(char *ddic_name);
 #endif
 
+#ifdef CONFIG_DEBUG_FS
 extern u32 get_pin_status_10(void);
+#endif
 
 static u32 get_intr2_status(struct sde_encoder_phys *phys_enc)
 {
@@ -532,9 +534,11 @@ static int _sde_encoder_phys_cmd_handle_ppdone_timeout(
 	if (!phys_enc || !phys_enc->hw_pp || !phys_enc->hw_ctl)
 		return -EINVAL;
 
+#ifdef CONFIG_DEBUG_FS
 	pr_err("pptimeout INTR2_STATUS 0x%x pin10 0x%x\n",
 			get_intr2_status(phys_enc),
 			get_pin_status_10());
+#endif
 
 	cmd_enc->pp_timeout_report_cnt++;
 
@@ -556,7 +560,9 @@ static int _sde_encoder_phys_cmd_handle_ppdone_timeout(
 #if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
 			sde_encoder_phys_cmd_te_monitor(),
 #endif
+#ifdef CONFIG_DEBUG_FS
 			get_pin_status_10(),
+#endif
 			get_intr2_status(phys_enc));
 
 	/* check if panel is still sending TE signal or not */
