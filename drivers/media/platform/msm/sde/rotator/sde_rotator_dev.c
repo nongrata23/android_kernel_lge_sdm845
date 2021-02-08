@@ -67,8 +67,11 @@ static void sde_rotator_retire_handler(struct kthread_work *work);
 static long sde_rotator_compat_ioctl32(struct file *file,
 	unsigned int cmd, unsigned long arg);
 #endif
+
+#ifdef CONFIG_DEBUG_FS
 #if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
 extern void sde_rot_dump_enable(bool enable);
+#endif
 #endif
 
 /*
@@ -3464,6 +3467,7 @@ static int panel_dead_state_callback(struct notifier_block *nb,
 	if (val != LGE_PANEL_EVENT_RECOVERY)
 		return 0;
 
+#ifdef CONFIG_DEBUG_FS
 	if (evdata) {
 		if (evdata->state == LGE_PANEL_RECOVERY_DEAD) {
 			sde_rot_dump_enable(false);
@@ -3473,6 +3477,7 @@ static int panel_dead_state_callback(struct notifier_block *nb,
 			pr_err("Invalid event state\n");
 		}
 	}
+#endif
 	return 0;
 }
 
