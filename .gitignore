@@ -119,6 +119,8 @@ all.config
 # fetched Android config fragments
 kernel/configs/android-*.cfg
 
+#ignore out 
+out/
 #
 #Ignoring Android.bp link file
 #

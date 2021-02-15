@@ -84,6 +84,8 @@ static DEFINE_SEMAPHORE(console_sem);
 struct console *console_drivers;
 EXPORT_SYMBOL_GPL(console_drivers);
 
+static size_t print_time(u64 ts, char *buf);
+
 #ifdef CONFIG_LOCKDEP
 static struct lockdep_map console_lock_dep_map = {
 	.name = "console_lock"
@@ -533,6 +535,11 @@ static u32 truncate_msg(u16 *text_len, u16 *trunc_msg_len,
 	return msg_used_size(*text_len + *trunc_msg_len, 0, pad_len);
 }
 
+static void inline save_time(struct printk_log *msg) { }
+
+static void inline save_process(struct printk_log *msg) { }
+static size_t inline print_process(const struct printk_log *msg, char *buf) { return 0; }
+
 /* insert record into the buffer, discard old ones, update heads */
 static int log_store(int facility, int level,
 		     enum log_flags flags, u64 ts_nsec,
@@ -582,6 +589,7 @@ static int log_store(int facility, int level,
 		msg->ts_nsec = ts_nsec;
 	else
 		msg->ts_nsec = local_clock();
+
 	memset(log_dict(msg) + dict_len, 0, pad_len);
 	msg->len = size;
 
@@ -1044,7 +1052,6 @@ static void __init log_buf_add_cpu(void)
 	pr_info("log_buf_len total cpu_extra contributions: %d bytes\n",
 		cpu_extra);
 	pr_info("log_buf_len min size: %d bytes\n", __LOG_BUF_LEN);
-
 	log_buf_len_update(cpu_extra + __LOG_BUF_LEN);
 }
 #else /* !CONFIG_SMP */
@@ -1859,12 +1866,20 @@ asmlinkage int vprintk_emit(int facility, int level,
 	if (!in_sched) {
 		lockdep_off();
 		/*
+		 * Disable preemption to avoid being preempted while holding
+		 * console_sem which would prevent anyone from printing to
+		 * console
+		 */
+		preempt_disable();
+
+		/*
 		 * Try to acquire and then immediately release the console
 		 * semaphore.  The release will print out buffers and wake up
 		 * /dev/kmsg and syslog() users.
 		 */
 		if (console_trylock())
 			console_unlock();
+		preempt_enable();
 		lockdep_on();
 	}
 
@@ -2201,20 +2216,7 @@ int console_trylock(void)
 		return 0;
 	}
 	console_locked = 1;
-	/*
-	 * When PREEMPT_COUNT disabled we can't reliably detect if it's
-	 * safe to schedule (e.g. calling printk while holding a spin_lock),
-	 * because preempt_disable()/preempt_enable() are just barriers there
-	 * and preempt_count() is always 0.
-	 *
-	 * RCU read sections have a separate preemption counter when
-	 * PREEMPT_RCU enabled thus we must take extra care and check
-	 * rcu_preempt_depth(), otherwise RCU read sections modify
-	 * preempt_count().
-	 */
-	console_may_schedule = !oops_in_progress &&
-			preemptible() &&
-			!rcu_preempt_depth();
+	console_may_schedule = 0;
 	return 1;
 }
 EXPORT_SYMBOL(console_trylock);
@@ -2498,8 +2500,29 @@ void console_flush_on_panic(void)
 	 */
 	console_trylock();
 	console_may_schedule = 0;
+	console_suspended = 0;
 	console_unlock();
 }
+
+#ifdef CONFIG_MACH_LGE
+static atomic_t console_uart = ATOMIC_INIT(1);
+void console_uart_enable(void)
+{
+	console_flush_on_panic();
+	atomic_inc(&console_uart);
+}
+
+void console_uart_disable(void)
+{
+	atomic_dec(&console_uart);
+	console_flush_on_panic();
+}
+
+int console_uart_status(void)
+{
+	return (int)atomic_read(&console_uart);
+}
+#endif
 
 /*
  * Return the console tty driver structure and its associated index
