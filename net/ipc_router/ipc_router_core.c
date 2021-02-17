@@ -2777,16 +2777,7 @@ static void do_read_data(struct kthread_work *work)
 			     read_data);
 
 	while ((pkt = rr_read(xprt_info)) != NULL) {
-		if (pkt->length < calc_rx_header_size(xprt_info) ||
-		    pkt->length > MAX_IPC_PKT_SIZE) {
-			IPC_RTR_ERR("%s: Invalid pkt length %d\n", __func__,
-				    pkt->length);
-			goto read_next_pkt1;
-		}
 
-		ret = extract_header(pkt);
-		if (ret < 0)
-			goto read_next_pkt1;
 		hdr = &pkt->hdr;
 
 		if ((hdr->dst_node_id != IPC_ROUTER_NID_LOCAL) &&
