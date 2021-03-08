@@ -66,6 +66,7 @@
 #include <linux/memcontrol.h>
 #include <linux/show_mem_notifier.h>
 #include <linux/psi.h>
+#include <linux/devfreq_boost.h>
 
 #include <asm/sections.h>
 #include <asm/tlbflush.h>
@@ -3748,6 +3749,10 @@ retry_cpuset:
 	if (!ac->preferred_zoneref->zone)
 		goto nopage;
 
+
+	/* Boost DDR bus when memory is low so allocation latency doesn't get too bad */
+                devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 50);
+                devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 50);
 
 	/*
 	 * The fast path uses conservative alloc_flags to succeed only until
