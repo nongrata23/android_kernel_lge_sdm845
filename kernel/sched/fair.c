@@ -5920,7 +5920,10 @@ static unsigned long __cpu_norm_util(unsigned long util, unsigned long capacity)
 static unsigned long cpu_util_without(int cpu, struct task_struct *p)
 {
 	unsigned int util;
+
+#ifndef CONFIG_SCHED_WALT
 	struct cfs_rq *cfs_rq;
+#endif // CONFIG_SCHED_WALT
 
 #ifdef CONFIG_SCHED_WALT
 	/*
