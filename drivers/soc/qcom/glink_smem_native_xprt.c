@@ -40,10 +40,6 @@
 #include "glink_private.h"
 #include "glink_xprt_if.h"
 
-#ifdef CONFIG_LGE_PM
-#include "linux/suspend.h"
-#endif
-
 #define XPRT_NAME "smem"
 #define FIFO_FULL_RESERVE 8
 #define FIFO_ALIGNMENT 8
@@ -1344,22 +1340,8 @@ static void rx_worker(struct kthread_work *work)
 irqreturn_t irq_handler(int irq, void *priv)
 {
 	struct edge_info *einfo = (struct edge_info *)priv;
-#ifdef CONFIG_LGE_PM
-	struct irq_desc *desc = irq_to_desc(irq);
-	const char *name = "null";
-#endif
 	if (einfo->rx_reset_reg)
 		writel_relaxed(einfo->out_irq_mask, einfo->rx_reset_reg);
-#ifdef CONFIG_LGE_PM
-	if(suspend_debug_irq_pin()){
-		if (desc == NULL)
-			name = "stray irq";
-		else if (desc->action && desc->action->name)
-			name = desc->action->name;
-
-		pr_err("glink_smem_native_xprt : irq = %d, name = %s\n", irq, name);
-	}
-#endif
 	__rx_worker(einfo, true);
 	einfo->rx_irq_count++;
 
