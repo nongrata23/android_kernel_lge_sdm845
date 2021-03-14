@@ -854,28 +854,6 @@ void pm_print_active_wakeup_sources(void)
 
 	srcuidx = srcu_read_lock(&wakeup_srcu);
 
-#ifdef CONFIG_LGE_PM
-	list_for_each_entry_rcu(ws, &wakeup_sources, entry) {
-		if (ws->active) {
-			ws->pending_count++;
-			pr_info("active wakeup source: %s pending_count: %lu\n",
-				ws->name, ws->pending_count);
-			active = 1;
-		} else if (!active &&
-			    (!last_activity_ws ||
-			     ktime_to_ns(ws->last_time) >
-			     ktime_to_ns(last_activity_ws->last_time))) {
-			last_activity_ws = ws;
-		}
-	}
-
-	if (!active && last_activity_ws) {
-		last_activity_ws->pending_count++;
-		pr_info("last active wakeup source: %s pending_count: %lu\n",
-			last_activity_ws->name,
-			last_activity_ws->pending_count);
-	}
-#else
 	list_for_each_entry_rcu(ws, &wakeup_sources, entry) {
 		if (ws->active) {
 			pr_info("active wakeup source: %s\n", ws->name);
@@ -891,7 +869,6 @@ void pm_print_active_wakeup_sources(void)
 	if (!active && last_activity_ws)
 		pr_info("last active wakeup source: %s\n",
 			last_activity_ws->name);
-#endif
 	srcu_read_unlock(&wakeup_srcu, srcuidx);
 }
 EXPORT_SYMBOL_GPL(pm_print_active_wakeup_sources);
