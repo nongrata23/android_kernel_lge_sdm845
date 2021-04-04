@@ -32,6 +32,8 @@
 #include <linux/cpu_cooling.h>
 #include <linux/atomic.h>
 #include <linux/regulator/consumer.h>
+#include <linux/cpufreq.h>
+#include <linux/cpu.h>
 
 #include <asm/smp_plat.h>
 #include <asm/cacheflush.h>
