@@ -754,6 +754,8 @@ config PELT_UTIL_HALFLIFE_8
 
 endchoice
 
+endmenu
+
 #
 # For architectures that want to enable the support for NUMA-affine scheduler
 # balancing logic:
