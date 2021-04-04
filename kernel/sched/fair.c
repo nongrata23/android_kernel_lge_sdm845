@@ -6717,13 +6717,6 @@ boosted_cpu_util(int cpu)
 static inline unsigned long
 boosted_task_util(struct task_struct *p)
 {
-#ifdef CONFIG_UCLAMP_TASK_GROUP
-	unsigned long util = task_util(p);
-	unsigned long util_min = uclamp_eff_value(p, UCLAMP_MIN);
-	unsigned long util_max = uclamp_eff_value(p, UCLAMP_MAX);
-
-	return clamp(util, util_min, util_max);
-#else
 	unsigned long util = task_util_est(p);
 	long margin = schedtune_task_margin(p);
 
@@ -6733,8 +6726,6 @@ boosted_task_util(struct task_struct *p)
                 return util + margin;
         else
                 return util;
-
-#endif
 }
 
 static unsigned long cpu_util_without(int cpu, struct task_struct *p);
@@ -7477,10 +7468,6 @@ static inline int find_best_target(struct task_struct *p, int *backup_cpu,
 				isolated_candidate = i;
 
 			if (walt_cpu_high_irqload(i) || is_reserved(i))
-				continue;
-
-			/* Skip CPUs which do not fit task requirements */
-			if (capacity_of(i) < boosted_task_util(p))
 				continue;
 
 			/*
