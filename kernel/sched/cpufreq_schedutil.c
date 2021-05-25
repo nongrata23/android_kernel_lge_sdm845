@@ -24,16 +24,6 @@
 #include "triton/lge_triton.h"
 #endif
 
-#ifdef CONFIG_SCHED_WALT
-unsigned long boosted_cpu_util(int cpu);
-#endif
-
-/* Stub out fast switch routines present on mainline to reduce the backport
- * overhead. */
-#define cpufreq_driver_fast_switch(x, y) 0
-#define cpufreq_enable_fast_switch(x)
-#define cpufreq_disable_fast_switch(x)
-#define LATENCY_MULTIPLIER			(1000)
 #define SUGOV_KTHREAD_PRIORITY	50
 
 struct sugov_tunables {
@@ -223,9 +213,8 @@ static void sugov_get_util(unsigned long *util, unsigned long *max, int cpu)
 	*util = min(rq->cfs.avg.util_avg, cfs_max);
 	*max = cfs_max;
 
-	*util = cpu_util_freq(cpu, &loadcpu->walt_load);
-	*util = boosted_cpu_util(cpu);
-
+	*util = boosted_cpu_util(cpu, &loadcpu->walt_load);
+	
 #ifdef CONFIG_UCLAMP_TASK
 	*util = uclamp_util_with(rq, *util, NULL);
 	*util = min(*max, *util);
