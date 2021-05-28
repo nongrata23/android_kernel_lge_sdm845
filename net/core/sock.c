@@ -271,11 +271,7 @@ static const char *const af_family_clock_key_strings[AF_MAX+1] = {
  * sk_callback_lock locking rules are per-address-family,
  * so split the lock classes by using a per-AF key:
  */
-#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
-struct lock_class_key af_callback_keys[AF_MAX];
-#else
 static struct lock_class_key af_callback_keys[AF_MAX];
-#endif
 
 /* Take into consideration the size of the struct sk_buff overhead in the
  * determination of these values, since that is non-constant across
@@ -1358,13 +1354,8 @@ static void sock_copy(struct sock *nsk, const struct sock *osk)
 #endif
 }
 
-#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
-struct sock *sk_prot_alloc(struct proto *prot, gfp_t priority,
-		int family)
-#else
 static struct sock *sk_prot_alloc(struct proto *prot, gfp_t priority,
 		int family)
-#endif
 {
 	struct sock *sk;
 	struct kmem_cache *slab;
@@ -1374,17 +1365,8 @@ static struct sock *sk_prot_alloc(struct proto *prot, gfp_t priority,
 		sk = kmem_cache_alloc(slab, priority & ~__GFP_ZERO);
 		if (!sk)
 			return sk;
-#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
-		if (priority & __GFP_ZERO) {
-			if (prot->clear_sk)
-				prot->clear_sk(sk, prot->obj_size);
-			else
-				sk_prot_clear_nulls(sk, prot->obj_size);
-		}
-#else
 		if (priority & __GFP_ZERO)
 			sk_prot_clear_nulls(sk, prot->obj_size);
-#endif
 	} else
 		sk = kmalloc(prot->obj_size, priority);
 
@@ -1591,9 +1573,6 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 		newsk->sk_userlocks	= sk->sk_userlocks & ~SOCK_BINDPORT_LOCK;
 
 		sock_reset_flag(newsk, SOCK_DONE);
-#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
-		sock_reset_flag(newsk, SOCK_MPTCP);
-#endif
 		cgroup_sk_clone(&newsk->sk_cgrp_data);
 		skb_queue_head_init(&newsk->sk_error_queue);
 
