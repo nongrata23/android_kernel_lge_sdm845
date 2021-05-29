@@ -705,7 +705,6 @@ static int smb1355_parallel_get_prop(struct power_supply *psy,
 		val->intval = 0;
 		break;
 	default:
-#ifdef CONFIG_LGE_PM_DEBUG
 	// SMB1355 is not providing POWER_SUPPLY_PROP_ONLINE :
 	// power_supply_changed_work
 	// -> power_supply_update_leds
@@ -713,11 +712,11 @@ static int smb1355_parallel_get_prop(struct power_supply *psy,
 	//       -> power_supply_get_property(POWER_SUPPLY_PROP_ONLINE(4))
 	// So every power_supply_changed() causes
 	// => "SMB1355: smb1355_parallel_get_prop: parallel psy get prop 4 not supported"
-	if (prop != POWER_SUPPLY_PROP_ONLINE)
-#endif
+	if (prop != POWER_SUPPLY_PROP_ONLINE) {
 		pr_err_ratelimited("parallel psy get prop %d not supported\n",
 			prop);
 		return -EINVAL;
+        }
 	}
 
 	if (rc < 0) {

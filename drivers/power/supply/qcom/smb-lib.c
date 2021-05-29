@@ -3467,13 +3467,8 @@ irqreturn_t smblib_handle_debug(int irq, void *data)
 {
 	struct smb_irq_data *irq_data = data;
 	struct smb_charger *chg = irq_data->parent_data;
-
-#ifdef CONFIG_LGE_PM_DEBUG
-/* Skip the burst logs of input-current-limiting */
-if (strcmp(irq_data->name, "input-current-limiting") || *chg->debug_mask == 0xFF)
-#endif
-	smblib_dbg(chg, PR_INTERRUPT, "IRQ: %s\n", irq_data->name);
-	return IRQ_HANDLED;
+	       smblib_dbg(chg, PR_INTERRUPT, "IRQ: %s\n", irq_data->name);
+	       return IRQ_HANDLED;
 }
 
 irqreturn_t smblib_handle_otg_overcurrent(int irq, void *data)
