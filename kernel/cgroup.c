@@ -64,6 +64,7 @@
 #include <linux/file.h>
 #include <linux/psi.h>
 #include <net/sock.h>
+#include <linux/binfmts.h>
 #include <linux/cpu_input_boost.h>
 
 #define CREATE_TRACE_POINTS
