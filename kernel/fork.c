@@ -80,6 +80,8 @@
 #include <linux/sysctl.h>
 #include <linux/kcov.h>
 #include <linux/cpufreq_times.h>
+#include <linux/devfreq_boost.h>
+#include <linux/cpu_input_boost.h>
 
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
@@ -2119,7 +2121,6 @@ long _do_fork(unsigned long clone_flags,
 		devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 50);
 	}
 
->>>>>>> 5189356e5e76... devfreq_boost: Update and expand to handle CPUBW/LLCCBW boosting
 	/*
 	 * Determine whether and which event to report to ptracer.  When
 	 * called from kernel_thread or CLONE_UNTRACED is explicitly
