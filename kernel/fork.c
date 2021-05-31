@@ -81,7 +81,7 @@
 #include <linux/kcov.h>
 #include <linux/cpufreq_times.h>
 #include <linux/devfreq_boost.h>
-
+#include <linux/cpu_input_boost.h>
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
 #include <asm/uaccess.h>
