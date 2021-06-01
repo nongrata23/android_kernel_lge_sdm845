@@ -3386,8 +3386,9 @@ static int __ioctl_transition_dyn_mode_state(struct msm_fb_data_type *mfd,
 	switch (cmd) {
 	case MSMFB_ATOMIC_COMMIT:
 #ifdef CONFIG_DEVFREQ_BOOST
-		cpu_input_boost_kick();	
+		cpu_input_boost_kick();
 		devfreq_boost_kick(DEVFREQ_MSM_CPUBW);
+		devfreq_boost_kick(DEVFREQ_MSM_LLCCBW);
 #endif
 		if ((mfd->switch_state == MDSS_MDP_WAIT_FOR_VALIDATE)
 				&& validate) {
