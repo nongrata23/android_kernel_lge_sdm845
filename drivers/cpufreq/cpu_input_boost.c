@@ -453,7 +453,7 @@ static int __init cpu_input_boost_init(void)
 		goto unregister_handler;
 	}
 
-	thread = kthread_run(cpu_boost_thread, b, "cpu_boostd");
+	thread = kthread_run_perf_critical(cpu_boost_thread, b, "cpu_boostd");
 	if (IS_ERR(thread)) {
 		ret = PTR_ERR(thread);
 		pr_err("Failed to start CPU boost thread, err: %d\n", ret);
@@ -461,6 +461,7 @@ static int __init cpu_input_boost_init(void)
 	}
 
 	return 0;
+
 
 unregister_fb_notif:
 	msm_drm_unregister_client(&b->msm_drm_notif);
