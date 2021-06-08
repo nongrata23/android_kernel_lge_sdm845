@@ -80,6 +80,18 @@ assembling the 16-bit boot code, removing the need for ``as86`` to compile
 your kernel.  This change does, however, mean that you need a recent
 release of binutils.
 
+Flex
+----
+
+Since Linux 4.16, the build system generates lexical analyzers
+during build. This requires flex 2.5.35 or later.
+
+Bison
+-----
+
+Since Linux 4.16, the build system generates parsers
+during build. This requires bison 2.0 or later.
+
 Perl
 ----
 
@@ -343,6 +355,16 @@ Binutils
 --------
 
 - <ftp://ftp.kernel.org/pub/linux/devel/binutils/>
+
+Flex
+----
+
+o  <https://github.com/westes/flex/releases>
+
+Bison
+-----
+
+o  <ftp://ftp.gnu.org/gnu/bison/>
 
 OpenSSL
 -------
