@@ -185,10 +185,11 @@ irqreturn_t touch_irq_thread(int irq, void *dev_id)
 
 	pm_qos_update_request(&ts->pm_touch_req, 100);
 	pm_qos_update_request(&ts->pm_spi_req, 100);
+        pm_qos_update_request(&ts->pm_spi_req, PM_QOS_DEFAULT_VALUE);
+        pm_qos_update_request(&ts->pm_touch_req, PM_QOS_DEFAULT_VALUE);
+
 #if defined(CONFIG_SECURE_TOUCH)
 	if (secure_touch_filter_interrupt(ts) == IRQ_HANDLED) {
-	        pm_qos_update_request(&ts->pm_spi_req, PM_QOS_DEFAULT_VALUE);
-	        pm_qos_update_request(&ts->pm_touch_req, PM_QOS_DEFAULT_VALUE);
 		return IRQ_HANDLED;
 	}
 #endif
