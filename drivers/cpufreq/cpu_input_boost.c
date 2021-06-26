@@ -219,7 +219,7 @@ static void max_unboost_worker(struct work_struct *work)
 static int cpu_thread(void *data)
 {
 	static const struct sched_param sched_max_rt_prio = {
-		.sched_priority = MAX_RT_PRIO - 1
+		.sched_priority = 2
 	};
 	struct boost_drv *b = data;
 	unsigned long old_state = 0;
